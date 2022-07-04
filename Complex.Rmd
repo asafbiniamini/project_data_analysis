@@ -1,0 +1,232 @@
+---
+title: "Complex regression"
+output:
+  html_document:
+    theme: flatly
+    highlight: haddock
+---
+---
+<img src="logo.png"
+     width="150" 
+     height="100"
+     alt="Markdown Monster icon"  style="position:absolute;top:30px;left:870px;" />
+
+<p><p>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+library(ggplot2)
+library(tidyverse)
+library(readr)
+library(janitor)
+library(gplots)
+library(gridExtra)
+library(gginference)
+library(caTools)
+library(car)
+```
+
+```{r, include = FALSE}
+friends <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-08/friends.csv')
+friends_emotions <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-08/friends_emotions.csv')
+friends_info <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-08/friends_info.csv')
+
+```
+### Whether there is a realation between character appearnces to the IMDb rating
+<p><p>
+
+<p> To examine our hypothesis, we broke it into three main phases.<br>
+1) Create a table that counts how many sentences the charterer spoke in an episode.<br>
+2) Create a table that maps the rate and US views per episode (in millions). <br>
+3) Combine the data and create a Complex regression.<p>
+
+```{r, include= FALSE}
+dt_king_of <- friends %>% select(speaker,season,episode) %>%
+  group_by(speaker,season,episode) %>%
+  filter(grepl('Chandler Bing|Joey Tribbiani|Ross Geller|Rachel Green|Monica Geller|Phoebe Buffay', speaker)) %>%
+  group_by(speaker,season,episode) %>%
+  summarise(per_episode = n())
+
+prep_to_split <- dt_king_of %>%
+  summarise(
+    season,
+    episode,
+    Chandler_Bing = ifelse(speaker == "Chandler Bing", per_episode, 0),
+    Joey_Tribbiani = ifelse(speaker == "Joey Tribbiani", per_episode, 0),
+    Rachel_Green = ifelse(speaker == "Rachel Green", per_episode, 0),
+    Monica_Geller = ifelse(speaker == "Monica Geller", per_episode, 0),
+    Phoebe_Buffay = ifelse(speaker == "Phoebe Buffay", per_episode, 0),
+    Ross_Geller = ifelse(speaker == "Ross Geller", per_episode, 0))
+
+prep_to_split = subset(prep_to_split, select = -c(speaker))
+
+Ross <- prep_to_split %>% select(season, episode, Ross_Geller) %>%
+  filter(Ross_Geller != 0)
+Joey <- prep_to_split %>% select(season, episode, Joey_Tribbiani) %>%
+  filter(Joey_Tribbiani != 0)
+Rachel <- prep_to_split %>% select(season, episode, Rachel_Green) %>%
+  filter(Rachel_Green != 0)
+Monica <- prep_to_split %>% select(season, episode, Monica_Geller) %>%
+  filter(Monica_Geller != 0)
+Phoebe <- prep_to_split %>% select(season, episode, Phoebe_Buffay) %>%
+  filter(Phoebe_Buffay != 0)
+Chandler <- prep_to_split %>% select(season, episode, Chandler_Bing) %>%
+  filter(Chandler_Bing != 0)
+
+
+grade <- friends_info %>% select(season, episode, imdb_rating, us_views_millions)
+
+multiFull <- merge(merge(merge(merge(merge(merge(
+  Ross,
+  Monica, all = TRUE),
+  Joey, all = TRUE),
+  Rachel, all = TRUE),
+  Chandler, all = TRUE),
+  Phoebe, all = TRUE),
+  grade, all = TRUE) %>% 
+  arrange(season, episode)
+```
+
+```{r,include = FALSE}
+filterd = multiFull %>% filter(multiFull$us_views_millions<50)
+multiFull = subset(multiFull, select = -c(us_views_millions))
+```
+
+
+
+<br>
+**The graph below shows the amount of sentences every character spoke **
+<p>As can be seen, Ross and Rachel speaks the most, which might imply the result.<p>
+```{r}
+rank_speakers  <-  merge(dt_king_of,grade,by = c("season","episode"))
+rank_speakers <- rank_speakers %>% 
+  filter(!grepl('Sr.', speaker)) %>%
+  group_by(season, episode) %>% 
+  arrange(season, episode)
+
+agg_score <- rank_speakers %>% group_by(speaker) %>%
+  summarize(
+    score = sum(per_episode)
+  ) 
+
+ggplot(data = agg_score, aes(speaker,score)) + geom_col(colour = "steelblue", fill="steelblue")
+```
+
+<p>For creating the table for the model, we manipulated the data in three stages:<br>
+1) Group the data by charterer's name and count the utterances in every episode.<br>
+2) Merge IMDb rating to each of the episodes.<br>
+3) Select the only relevant information for the model.<p>
+<br>
+<p>In the table below, we can see the completed table.<br>
+The table includes a different column for each character who holds the number of sentences in the episode.<br>
+```{r}
+head(multiFull)
+```
+
+<p>With the completed table, we ran the model.
+The result below is the summary of the regression model.<p> 
+```{r}
+complex_reggrsion = lm(formula = imdb_rating ~ Ross_Geller +
+                        Monica_Geller + Joey_Tribbiani +Rachel_Green + Phoebe_Buffay +
+                        Chandler_Bing ,data = multiFull) 
+
+summary(complex_reggrsion)
+
+```
+
+<p>Results: Ross and Monica are the only charterers that we found an effect between their's amount of utterances and the IMDB rating <br> (*their mom should be really proud*). <br>
+In addition, we can see that Ross's result has the lowest Pr and the sharpest B1.<p>
+
+<!-- calculate the linear function based on the regression model -->
+```{r,include=FALSE}
+equation1=function(x){coef(complex_reggrsion)[2]*x+coef(complex_reggrsion)[1]}
+equation2=function(x){coef(complex_reggrsion)[3]*x+coef(complex_reggrsion)[1]}
+equation3=function(x){coef(complex_reggrsion)[4]*x+coef(complex_reggrsion)[1]}
+equation4=function(x){coef(complex_reggrsion)[5]*x+coef(complex_reggrsion)[1]}
+equation5=function(x){coef(complex_reggrsion)[6]*x+coef(complex_reggrsion)[1]}
+equation6=function(x){coef(complex_reggrsion)[7]*x+coef(complex_reggrsion)[1]}
+```
+
+
+```{r}
+
+liner_reg_Ross_Geller <-ggplot(filterd, aes(x = Ross_Geller, y = imdb_rating)) + 
+  geom_point(size =3, shape = 23, colour ="steelblue", fill = "steelblue") +
+   stat_function(fun=equation1,geom="line",col="grey", size =2)
+
+
+liner_reg_Monica_Geller <-ggplot(filterd, aes(x = Monica_Geller, y = imdb_rating)) + 
+  geom_point(size = 3, shape = 23, colour ="steelblue", fill = "steelblue") +
+   stat_function(fun=equation2,geom="line",col="grey", size =2)
+
+
+liner_reg_Joey_Tribbiani <-ggplot(filterd, aes(x = Joey_Tribbiani, y = imdb_rating)) + 
+  geom_point(size = 1, shape = 23, colour ="steelblue", fill = "steelblue") +
+   stat_function(fun=equation3,geom="line",col="grey", size =1.2)
+
+
+liner_reg_Rachel_Green <-ggplot(filterd, aes(x =Rachel_Green , y = imdb_rating)) + 
+  geom_point(size = 1, shape = 23, colour ="steelblue", fill = "steelblue") +
+   stat_function(fun=equation4,geom="line",col="grey", size =1.2)
+
+
+liner_reg_Phoebe_Buffay <-ggplot(filterd, aes(x = Phoebe_Buffay, y = imdb_rating)) + 
+  geom_point(size = 1, shape = 23, colour ="steelblue", fill = "steelblue") +
+   stat_function(fun=equation5,geom="line",col="grey", size =1.2)
+
+
+liner_reg_Chandler_Bing <-ggplot(filterd, aes(x = Chandler_Bing, y = imdb_rating)) + 
+  geom_point(size = 1, shape = 23, colour ="steelblue", fill = "steelblue") +
+   stat_function(fun=equation6,geom="line",col="grey", size =1.2)
+
+```
+
+<br><br>
+**Demonstrate the relation between actor and rating**<br>
+<p>The grapes below show the b1 of the regression for each variable.<br>
+As can be seen in the regression summary, two variables impact the IMDb rating.<p>
+
+:::: {.columns}
+::: {.column width="50%"}
+```{r, echo = F}
+liner_reg_Ross_Geller
+```
+:::
+
+::: {.column width="50%"}
+```{r, echo = F}
+liner_reg_Monica_Geller
+```
+:::
+::::
+
+<br>
+
+**Demonstrate no relation between actor appearances to rating**
+<p>The grapes below show that b1=0 in the regression for each variable.<br>
+The regression summary shows that four variables do not impact the IMDb rating.<p>
+
+
+```{r,echo = F}
+grid.arrange(liner_reg_Chandler_Bing, liner_reg_Rachel_Green,liner_reg_Phoebe_Buffay,liner_reg_Joey_Tribbiani,nrow = 2)
+```
+
+
+<p>At this stage, we saw a connection between Phoebe's utterances amount per episode and the IMDb rating.<br>
+so to ensure our variables don't interfere and that the correlation and the strength of correlation between the predictor variables don't harm the regression model, we use the VIF function.<p>
+<br>
+<p>**The Graph below represent the VIF of the complex regression model**<br>
+<br>
+
+```{r}
+vif_values <- vif(complex_reggrsion)
+vif_values_value <- c(1.033673,1.095303,1.153097,1.029526,1.120718,1.017614,1.176870)
+vif_values_names <- c("us_views_millions","Ross_Geller","Monica_Geller","Joey_Tribbiani","Rachel_Green","Phoebe_Buffay","Chandler_Bing" )
+par(mar=c(5,10,4,1)+.1)
+barplot(height=vif_values_value, names=vif_values_names, las =1 , width = 25, legend = TRUE,
+        names.arg=c("us_views_millions","Ross_Geller","Monica_Geller","Joey_Tribbiani","Rachel_Green","Phoebe_Buffay","Chandler_Bing"), main = "VIF Values", horiz = TRUE, col = "steelblue", xlim = c(0,10)) 
+  abline(v = 5, lwd = 3, lty = 10)
+```
+<p> As can be seen, no variable got more than 5, which means that they are fine.<p>
+
+<h3>our conclusion: Ross is the character who brings the most rating to every episode!</h3>

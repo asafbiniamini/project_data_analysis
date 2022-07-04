@@ -1,0 +1,4 @@
+"0","Point_plot <- ggplot(data= dt_grouped, aes(x = views, y = rate)) +"
+"0","  geom_point()"
+"0","Point_plot "
+"0",""

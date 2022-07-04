@@ -1,0 +1,1 @@
+"0","Sad_test <- prop.test(x = 373, n = 669, p = 0.5, alternative = ""two.sided"")"

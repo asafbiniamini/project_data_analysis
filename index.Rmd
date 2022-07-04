@@ -1,0 +1,46 @@
+---
+title: "Friends Analysis"
+output:
+  html_document:
+    theme: flatly
+    highlight: haddock
+---
+---
+<img src="logo.png"
+     width="150" 
+     height="100"
+     alt="Markdown Monster icon"  style="position:absolute;top:50px;left:870px;" />
+<h2>
+<span style = "color :light grey;">
+Background
+</span>
+</h2>
+<div>
+<p>The project will discuss the relations between the collected data from the series "Friends" to the IMDb rating and the character's emotions along the series.<br>
+Our two Research Questions our models come to solve are:<br>
+1. Who is the character brings the most rating to the series?<br>
+2. Have any differences in the proportions of emotional expression between females to males? <p>
+
+<p>
+
+<p>
+</div>
+
+<div>
+<img src="Friends_background.jpeg"
+     width="200" 
+     height="250"
+     alt="Markdown Monster icon"
+     style="float: right; margin-right: 10px;" />
+
+<h3>About friends</h3>
+
+<p>Friends is an American television sitcom created by David Crane and Marta Kauffman, which aired on NBC from September 22, 1994, to May 6, 2004, lasting ten seasons.<br>
+<br>
+With an ensemble cast consisting of Jennifer Aniston, Courteney Cox, Lisa Kudrow, Matt LeBlanc, Matthew Perry, and David Schwimmer, the show revolves around six friends in their 20s and 30s who live in Manhattan, New York City.<br>
+<br>
+Bright/Kauffman/Crane Productions produced the series associated with Warner Bros Television. The original executive producers were Kevin S. Bright, Kauffman, and Crane.<br>
+<br>Friends received acclaim throughout its run, becoming one of the most popular television shows. The series was nominated for 62 Primetime Emmy Awards. The show ranked no. 21 on TV Guide's 50 Greatest TV Shows of All Time and no. 7 on Empire magazine's The 50 Greatest TV Shows.<p></div>
+
+
+

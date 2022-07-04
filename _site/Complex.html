@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Complex regression</title>
+
+<script src="site_libs/header-attrs-2.9/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; } /* Alert */
+code span.an { color: #008000; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #0000ff; } /* ControlFlow */
+code span.ch { color: #008080; } /* Char */
+code span.cn { } /* Constant */
+code span.co { color: #008000; } /* Comment */
+code span.cv { color: #008000; } /* CommentVar */
+code span.do { color: #008000; } /* Documentation */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.im { } /* Import */
+code span.in { color: #008000; } /* Information */
+code span.kw { color: #0000ff; } /* Keyword */
+code span.op { } /* Operator */
+code span.ot { color: #ff4000; } /* Other */
+code span.pp { color: #ff4000; } /* Preprocessor */
+code span.sc { color: #008080; } /* SpecialChar */
+code span.ss { color: #008080; } /* SpecialString */
+code span.st { color: #008080; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #008080; } /* VerbatimString */
+code span.wa { color: #008000; font-weight: bold; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Friends Project</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="Data_import.html">Data imporation</a>
+</li>
+<li>
+  <a href="Data_preperation.html">Data visualization</a>
+</li>
+<li>
+  <a href="Complex.html">Complex Regreasion</a>
+</li>
+<li>
+  <a href="Prop_test.html">Proportion Test</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Complex regression</h1>
+
+</div>
+
+
+<hr />
+<p><img src="logo.png"
+     width="150" 
+     height="100"
+     alt="Markdown Monster icon"  style="position:absolute;top:30px;left:870px;" /></p>
+<p>
+<p>
+<div id="whether-there-is-a-realation-between-character-appearnces-to-the-imdb-rating" class="section level3">
+<h3>Whether there is a realation between character appearnces to the IMDb rating</h3>
+<p>
+<p>
+<p>
+To examine our hypothesis, we broke it into three main phases.<br> 1) Create a table that counts how many sentences the charterer spoke in an episode.<br> 2) Create a table that maps the rate and US views per episode (in millions). <br> 3) Combine the data and create a Complex regression.
+<p>
+<br> <strong>The graph below shows the amount of sentences every character spoke </strong>
+<p>
+As can be seen, Ross and Rachel speaks the most, which might imply the result.
+<p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>rank_speakers  <span class="ot">&lt;-</span>  <span class="fu">merge</span>(dt_king_of,grade,<span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;season&quot;</span>,<span class="st">&quot;episode&quot;</span>))</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>rank_speakers <span class="ot">&lt;-</span> rank_speakers <span class="sc">%&gt;%</span> </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">grepl</span>(<span class="st">&#39;Sr.&#39;</span>, speaker)) <span class="sc">%&gt;%</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(season, episode) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(season, episode)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>agg_score <span class="ot">&lt;-</span> rank_speakers <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(speaker) <span class="sc">%&gt;%</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">score =</span> <span class="fu">sum</span>(per_episode)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  ) </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> agg_score, <span class="fu">aes</span>(speaker,score)) <span class="sc">+</span> <span class="fu">geom_col</span>(<span class="at">colour =</span> <span class="st">&quot;steelblue&quot;</span>, <span class="at">fill=</span><span class="st">&quot;steelblue&quot;</span>)</span></code></pre></div>
+<p><img src="Complex_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>
+For creating the table for the model, we manipulated the data in three stages:<br> 1) Group the data by charterer’s name and count the utterances in every episode.<br> 2) Merge IMDb rating to each of the episodes.<br> 3) Select the only relevant information for the model.
+<p>
+<br>
+<p>
+<p>In the table below, we can see the completed table.<br> The table includes a different column for each character who holds the number of sentences in the episode.<br></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(multiFull)</span></code></pre></div>
+<pre><code>##   season episode Ross_Geller Monica_Geller Joey_Tribbiani Rachel_Green
+## 1      1       1          47            73             39           48
+## 2      1       2          68            28              8           38
+## 3      1       3          33            52             28           26
+## 4      1       4          40            47             24           43
+## 5      1       5          40            33             36           37
+## 6      1       6          22            34             31           15
+##   Chandler_Bing Phoebe_Buffay imdb_rating
+## 1            39            19         8.3
+## 2            16            14         8.1
+## 3            36            38         8.2
+## 4            32            31         8.1
+## 5            35            23         8.5
+## 6            58            10         8.1</code></pre>
+<p>
+With the completed table, we ran the model. The result below is the summary of the regression model.
+<p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>complex_reggrsion <span class="ot">=</span> <span class="fu">lm</span>(<span class="at">formula =</span> imdb_rating <span class="sc">~</span> Ross_Geller <span class="sc">+</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                        Monica_Geller <span class="sc">+</span> Joey_Tribbiani <span class="sc">+</span>Rachel_Green <span class="sc">+</span> Phoebe_Buffay <span class="sc">+</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                        Chandler_Bing ,<span class="at">data =</span> multiFull) </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(complex_reggrsion)</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = imdb_rating ~ Ross_Geller + Monica_Geller + Joey_Tribbiani + 
+##     Rachel_Green + Phoebe_Buffay + Chandler_Bing, data = multiFull)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.34261 -0.26492 -0.03229  0.23573  1.30214 
+## 
+## Coefficients:
+##                  Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     7.9193379  0.1576485  50.234  &lt; 2e-16 ***
+## Ross_Geller     0.0065995  0.0018705   3.528 0.000505 ***
+## Monica_Geller   0.0044872  0.0022638   1.982 0.048661 *  
+## Joey_Tribbiani  0.0009816  0.0019844   0.495 0.621313    
+## Rachel_Green    0.0005370  0.0019658   0.273 0.784963    
+## Phoebe_Buffay   0.0022627  0.0022730   0.996 0.320541    
+## Chandler_Bing  -0.0000432  0.0020440  -0.021 0.983157    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.387 on 229 degrees of freedom
+## Multiple R-squared:  0.08164,    Adjusted R-squared:  0.05758 
+## F-statistic: 3.393 on 6 and 229 DF,  p-value: 0.003167</code></pre>
+<p>
+Results: Ross and Monica are the only charterers that we found an effect between their’s amount of utterances and the IMDB rating <br> (<em>their mom should be really proud</em>). <br> In addition, we can see that Ross’s result has the lowest Pr and the sharpest B1.
+<p>
+<!-- calculate the linear function based on the regression model -->
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>liner_reg_Ross_Geller <span class="ot">&lt;-</span><span class="fu">ggplot</span>(filterd, <span class="fu">aes</span>(<span class="at">x =</span> Ross_Geller, <span class="at">y =</span> imdb_rating)) <span class="sc">+</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span><span class="dv">3</span>, <span class="at">shape =</span> <span class="dv">23</span>, <span class="at">colour =</span><span class="st">&quot;steelblue&quot;</span>, <span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>) <span class="sc">+</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">stat_function</span>(<span class="at">fun=</span>equation1,<span class="at">geom=</span><span class="st">&quot;line&quot;</span>,<span class="at">col=</span><span class="st">&quot;grey&quot;</span>, <span class="at">size =</span><span class="dv">2</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>liner_reg_Monica_Geller <span class="ot">&lt;-</span><span class="fu">ggplot</span>(filterd, <span class="fu">aes</span>(<span class="at">x =</span> Monica_Geller, <span class="at">y =</span> imdb_rating)) <span class="sc">+</span> </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">shape =</span> <span class="dv">23</span>, <span class="at">colour =</span><span class="st">&quot;steelblue&quot;</span>, <span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>) <span class="sc">+</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>   <span class="fu">stat_function</span>(<span class="at">fun=</span>equation2,<span class="at">geom=</span><span class="st">&quot;line&quot;</span>,<span class="at">col=</span><span class="st">&quot;grey&quot;</span>, <span class="at">size =</span><span class="dv">2</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>liner_reg_Joey_Tribbiani <span class="ot">&lt;-</span><span class="fu">ggplot</span>(filterd, <span class="fu">aes</span>(<span class="at">x =</span> Joey_Tribbiani, <span class="at">y =</span> imdb_rating)) <span class="sc">+</span> </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">23</span>, <span class="at">colour =</span><span class="st">&quot;steelblue&quot;</span>, <span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>) <span class="sc">+</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>   <span class="fu">stat_function</span>(<span class="at">fun=</span>equation3,<span class="at">geom=</span><span class="st">&quot;line&quot;</span>,<span class="at">col=</span><span class="st">&quot;grey&quot;</span>, <span class="at">size =</span><span class="fl">1.2</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>liner_reg_Rachel_Green <span class="ot">&lt;-</span><span class="fu">ggplot</span>(filterd, <span class="fu">aes</span>(<span class="at">x =</span>Rachel_Green , <span class="at">y =</span> imdb_rating)) <span class="sc">+</span> </span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">23</span>, <span class="at">colour =</span><span class="st">&quot;steelblue&quot;</span>, <span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>) <span class="sc">+</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>   <span class="fu">stat_function</span>(<span class="at">fun=</span>equation4,<span class="at">geom=</span><span class="st">&quot;line&quot;</span>,<span class="at">col=</span><span class="st">&quot;grey&quot;</span>, <span class="at">size =</span><span class="fl">1.2</span>)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>liner_reg_Phoebe_Buffay <span class="ot">&lt;-</span><span class="fu">ggplot</span>(filterd, <span class="fu">aes</span>(<span class="at">x =</span> Phoebe_Buffay, <span class="at">y =</span> imdb_rating)) <span class="sc">+</span> </span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">23</span>, <span class="at">colour =</span><span class="st">&quot;steelblue&quot;</span>, <span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>) <span class="sc">+</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>   <span class="fu">stat_function</span>(<span class="at">fun=</span>equation5,<span class="at">geom=</span><span class="st">&quot;line&quot;</span>,<span class="at">col=</span><span class="st">&quot;grey&quot;</span>, <span class="at">size =</span><span class="fl">1.2</span>)</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>liner_reg_Chandler_Bing <span class="ot">&lt;-</span><span class="fu">ggplot</span>(filterd, <span class="fu">aes</span>(<span class="at">x =</span> Chandler_Bing, <span class="at">y =</span> imdb_rating)) <span class="sc">+</span> </span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">23</span>, <span class="at">colour =</span><span class="st">&quot;steelblue&quot;</span>, <span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>) <span class="sc">+</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>   <span class="fu">stat_function</span>(<span class="at">fun=</span>equation6,<span class="at">geom=</span><span class="st">&quot;line&quot;</span>,<span class="at">col=</span><span class="st">&quot;grey&quot;</span>, <span class="at">size =</span><span class="fl">1.2</span>)</span></code></pre></div>
+<br><br> <strong>Demonstrate the relation between actor and rating</strong><br>
+<p>
+The grapes below show the b1 of the regression for each variable.<br> As can be seen in the regression summary, two variables impact the IMDb rating.
+<p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img src="Complex_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div><div class="column" style="width:50%;">
+<p><img src="Complex_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+</div>
+<p><br></p>
+<strong>Demonstrate no relation between actor appearances to rating</strong>
+<p>
+The grapes below show that b1=0 in the regression for each variable.<br> The regression summary shows that four variables do not impact the IMDb rating.
+<p>
+<p><img src="Complex_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>
+At this stage, we saw a connection between Phoebe’s utterances amount per episode and the IMDb rating.<br> so to ensure our variables don’t interfere and that the correlation and the strength of correlation between the predictor variables don’t harm the regression model, we use the VIF function.
+<p>
+<br>
+<p>
+<p><strong>The Graph below represent the VIF of the complex regression model</strong><br> <br></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>vif_values <span class="ot">&lt;-</span> <span class="fu">vif</span>(complex_reggrsion)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>vif_values_value <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">1.033673</span>,<span class="fl">1.095303</span>,<span class="fl">1.153097</span>,<span class="fl">1.029526</span>,<span class="fl">1.120718</span>,<span class="fl">1.017614</span>,<span class="fl">1.176870</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>vif_values_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;us_views_millions&quot;</span>,<span class="st">&quot;Ross_Geller&quot;</span>,<span class="st">&quot;Monica_Geller&quot;</span>,<span class="st">&quot;Joey_Tribbiani&quot;</span>,<span class="st">&quot;Rachel_Green&quot;</span>,<span class="st">&quot;Phoebe_Buffay&quot;</span>,<span class="st">&quot;Chandler_Bing&quot;</span> )</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar=</span><span class="fu">c</span>(<span class="dv">5</span>,<span class="dv">10</span>,<span class="dv">4</span>,<span class="dv">1</span>)<span class="sc">+</span>.<span class="dv">1</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(<span class="at">height=</span>vif_values_value, <span class="at">names=</span>vif_values_names, <span class="at">las =</span><span class="dv">1</span> , <span class="at">width =</span> <span class="dv">25</span>, <span class="at">legend =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">names.arg=</span><span class="fu">c</span>(<span class="st">&quot;us_views_millions&quot;</span>,<span class="st">&quot;Ross_Geller&quot;</span>,<span class="st">&quot;Monica_Geller&quot;</span>,<span class="st">&quot;Joey_Tribbiani&quot;</span>,<span class="st">&quot;Rachel_Green&quot;</span>,<span class="st">&quot;Phoebe_Buffay&quot;</span>,<span class="st">&quot;Chandler_Bing&quot;</span>), <span class="at">main =</span> <span class="st">&quot;VIF Values&quot;</span>, <span class="at">horiz =</span> <span class="cn">TRUE</span>, <span class="at">col =</span> <span class="st">&quot;steelblue&quot;</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">10</span>)) </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">5</span>, <span class="at">lwd =</span> <span class="dv">3</span>, <span class="at">lty =</span> <span class="dv">10</span>)</span></code></pre></div>
+<img src="Complex_files/figure-html/unnamed-chunk-12-1.png" width="672" />
+<p>
+As can be seen, no variable got more than 5, which means that they are fine.
+<p>
+<h3>
+our conclusion: Ross is the character who brings the most rating to every episode!
+</h3>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

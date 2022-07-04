@@ -1,0 +1,5 @@
+"0","dt_grouped_line <- ggplot(data = filterd, aes(x = us_views_millions, y = imdb_rating)) +"
+"0","  geom_point() +"
+"0","  geom_line(data = fortify(fit))"
+"0","dt_grouped_line"
+"0",""

@@ -1,0 +1,3 @@
+"0","by(data_france$Rating,data_france$Region,summary)"
+"2","Error in data_france$Rating : $ operator is invalid for atomic vectors
+"

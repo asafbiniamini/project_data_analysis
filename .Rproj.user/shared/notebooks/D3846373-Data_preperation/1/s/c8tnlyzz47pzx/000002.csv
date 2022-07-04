@@ -1,0 +1,40 @@
+"0","friends <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-08/friends.csv')"
+"1","
+[36m──[39m [1mColumn specification[22m [36m──────────────────────────────────────────────────────────────────────────────────────────────────────[39m
+cols(
+  text = [31mcol_character()[39m,
+  speaker = [31mcol_character()[39m,
+  season = [32mcol_double()[39m,
+  episode = [32mcol_double()[39m,
+  scene = [32mcol_double()[39m,
+  utterance = [32mcol_double()[39m
+)
+
+"
+"0","friends_emotions <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-08/friends_emotions.csv')"
+"1","
+[36m──[39m [1mColumn specification[22m [36m──────────────────────────────────────────────────────────────────────────────────────────────────────[39m
+cols(
+  season = [32mcol_double()[39m,
+  episode = [32mcol_double()[39m,
+  scene = [32mcol_double()[39m,
+  utterance = [32mcol_double()[39m,
+  emotion = [31mcol_character()[39m
+)
+
+"
+"0","friends_info <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-08/friends_info.csv')"
+"1","
+[36m──[39m [1mColumn specification[22m [36m──────────────────────────────────────────────────────────────────────────────────────────────────────[39m
+cols(
+  season = [32mcol_double()[39m,
+  episode = [32mcol_double()[39m,
+  title = [31mcol_character()[39m,
+  directed_by = [31mcol_character()[39m,
+  written_by = [31mcol_character()[39m,
+  air_date = [34mcol_date(format = """")[39m,
+  us_views_millions = [32mcol_double()[39m,
+  imdb_rating = [32mcol_double()[39m
+)
+
+"

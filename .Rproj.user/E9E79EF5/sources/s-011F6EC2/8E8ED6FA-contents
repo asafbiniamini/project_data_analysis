@@ -1,0 +1,66 @@
+---
+title: "Importing Data"
+output:
+  html_document:
+    theme: flatly
+    highlight: haddock
+---
+---
+<img src="logo.png"
+     width="150" 
+     height="100"
+     alt="Markdown Monster icon"  style="position:absolute;top:30px;left:870px;" />
+     
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+library(ggplot2)
+library(tidyverse)
+library(readr)
+library(janitor)
+library(gplots)
+library(gridExtra)
+library(gginference)
+```
+
+```{r, include = FALSE}
+friends <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-08/friends.csv')
+friends_emotions <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-08/friends_emotions.csv')
+friends_info <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-08/friends_info.csv')
+
+```
+
+
+
+**Data processing**
+
+<div>
+In the project we used in three tables, in which every table gathered different aspect of the data. <br>
+
+1) friends_info: Meta-Data of the series.<br>
+2) friends_emotions: The emotion expressed in every utterance (Season 1-4) <br>
+3) friends: Every utterance in the series and who said it.
+
+<a href="https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-09-08/readme.md">
+<span style="color: grey;"><u>link to the data set</u></span></a>
+</div>
+
+<p><br><p>
+
+<p style="text-align: center;"> **friend_info** <p>
+```{r, echo = F}
+glimpse(friends_info)
+```
+
+<p style="text-align: center;"> **friends_emotions** <p>
+
+```{r, echo = F}
+glimpse(friends_emotions)
+```
+
+
+<p style="text-align: center;"> **friends** <p>
+```{r, echo = F}
+glimpse(friends)
+```
+
+

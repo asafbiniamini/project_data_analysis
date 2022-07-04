@@ -1,0 +1,9 @@
+"0","grid <-grid.arrange(liner_reg1, liner_reg4,liner_reg5,liner_reg6,nrow = 2)"
+"2","`geom_smooth()` using formula 'y ~ x'
+"
+"2","`geom_smooth()` using formula 'y ~ x'
+"
+"2","`geom_smooth()` using formula 'y ~ x'
+"
+"2","`geom_smooth()` using formula 'y ~ x'
+"

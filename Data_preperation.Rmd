@@ -1,0 +1,141 @@
+---
+title: "Data preperation&visualization"
+output: 
+  html_document:
+    theme: flatly
+    highlight: haddock
+---
+---
+<img src="logo.png"
+     width="150" 
+     height="100"
+     alt="Markdown Monster icon"  style="position:absolute;top:30px;left:870px;" />
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+library(ggplot2)
+library(tidyverse)
+library(readr)
+library(janitor)
+library(gplots)
+library(gridExtra)
+library(gginference)
+library(caTools)
+library(car)
+```
+
+
+```{r, include = FALSE}
+friends <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-08/friends.csv')
+friends_emotions <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-08/friends_emotions.csv')
+friends_info <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-08/friends_info.csv')
+
+```
+  
+**Data Preparation and examination**
+<p>Before starting working on the project, we wanted to ensure that the rating was not steady during the series.<br>
+To examine this hypothesis, we created three visualizations which helped us understand how's the data looked like<br>
+1) Density<br>
+2) Change over time<br>
+3) Relation between US view to IMDb rating <p>
+
+**density of the rating**
+<Before starting working on the data, we wanted to know if IMDB rating is distributed evenly, Normally or other known distribution.<br>
+
+<p>As can be seen, the distribution looks like a Normal, with a big variance <p>
+
+```{r, include=TRUE}
+rating_dentisy <- ggplot(friends_info, aes(x=imdb_rating)) + 
+  geom_density(col ="steelblue", fill = "steelblue" )
+
+rating_dentisy
+
+```
+<p>For checking the hypothesis we conducted a Shapiro test to examine it.<p>
+```{r}
+shapiro.test(friends_info$imdb_rating)
+```
+<p>By the above result (p-value is less than 0.05), we deny our null hypothesis, in which the distribution is Normal.<br>
+
+<p>
+<br>
+**Change Over Time**
+<p>As well as the type of distribution, we wanted to be unsure that the IMDb rating is not steady over time.<br>
+As can be seen in the graph below, the IMDb rating is not steady and without a permanent pattern.<p>
+```{r}
+mean_rating_per_season <- ggplot(data = friends_info, aes(x = interaction(season, episode), 
+                      y = imdb_rating, group = 1)) +
+  geom_line(col ="steelblue") 
+mean_rating_per_season
+```
+
+
+<br>
+**Relation between the US view to IMDb rating**
+<p>In addition to the above tests, we assume that the US_million_views will Impact our hypothesis as it may have a high correlation with rating.
+<br> So we visualize the relation between them by two means.<br>
+1) Average rating of the episode based on how many views it got.<br>
+2) Pearson Test to ensure correlation.<p>
+
+<p>The graph below shows the average IMDb rating categorize on US views in millions<br>
+As can be seen, there is a visual correlation between the number of views and the average IMDb rating.
+<p>
+
+```{r}
+dt <- friends_info %>% select(us_views_millions, imdb_rating)
+interval_breaks <- c(0,18,20,22,24,26,28,30,32,34,36,38,55)
+
+dt_grouped <- dt %>%
+  mutate(views = cut(us_views_millions, breaks = interval_breaks)) %>%
+  group_by(views) %>%
+  summarize(
+    rate = mean(imdb_rating)
+  )
+```
+
+```{r, include = FALSE}
+Point_plot <- ggplot(data= dt_grouped, aes(x = views, y = rate)) +
+  geom_point(size = 5, shape = 23, colour ="steelblue", fill = "steelblue") + ylim(7.5,10)
+
+col_plot <- ggplot(data= dt_grouped, aes(x = views, y = rate)) +
+  geom_col(size = 2, fill = "steelblue") + ylim(0,10)
+```
+
+
+:::: {.columns}
+::: {.column width="50%"}
+```{r, echo = F}
+Point_plot
+```
+:::
+
+::: {.column width="50%"}
+```{r, echo = F}
+col_plot
+```
+:::
+::::
+<br>
+<p> To ensure that there is a real correlation, we conducted a **Pearson Test**.<br>
+The graph result below shows the result of the correlation test between US millions of views to IMDb rating<p>
+<p>As can be seen, the P-value is less than 5%, which means there is a correlation between the number of views and the average IMDb rating.<br>
+Moreover, the test gives us the correlation coefficient, which stands at 0.377.<p>
+<br>
+
+:::: {.columns}
+::: {.column width="50%"}
+```{r, echo = F}
+cor.test(x= friends_info$us_views_millions,y = friends_info$imdb_rating, method = "pearson")
+```
+:::
+
+::: {.column width="50%"}
+```{r, echo = F}
+ggplot(friends_info, aes(x = friends_info$us_views_millions, y = friends_info$imdb_rating)) + 
+  geom_point(size = 2, shape = 23, colour ="steelblue", fill = "steelblue") +
+  stat_smooth(method = "lm", col = "grey", se = FALSE)
+```
+:::
+::::
+
+

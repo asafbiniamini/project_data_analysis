@@ -1,0 +1,15 @@
+name: "my-website"
+navbar:
+  title: "Friends Project"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Data imporation"
+      href: Data_import.html
+    - text: "Data visualization"
+      href: Data_preperation.html
+    - text: "Complex Regreasion"
+      href: Complex.html
+    - text: "Proportion Test"
+      href: Prop_test.html
+    

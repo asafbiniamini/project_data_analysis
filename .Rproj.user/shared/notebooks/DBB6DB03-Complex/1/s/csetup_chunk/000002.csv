@@ -1,0 +1,86 @@
+"0","knitr::opts_chunk$set(warning = FALSE, message = FALSE) "
+"2","Warning messages:
+"
+"2","1: replacing previous import ‘lifecycle::last_warnings’ by ‘rlang::last_warnings’ when loading ‘tibble’ 
+"
+"2","2: replacing previous import ‘lifecycle::last_warnings’ by ‘rlang::last_warnings’ when loading ‘pillar’ 
+"
+"2","3: replacing previous import ‘lifecycle::last_warnings’ by ‘rlang::last_warnings’ when loading ‘hms’ 
+"
+"0","library(ggplot2)"
+"0","library(tidyverse)"
+"2","Registered S3 methods overwritten by 'dbplyr':
+  method         from
+  print.tbl_lazy     
+  print.tbl_sql      
+"
+"2","[30m── [1mAttaching packages[22m ───────────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.1 ──[39m
+"
+"2","[30m[32m✔[30m [34mtibble [30m 3.1.2     [32m✔[30m [34mdplyr  [30m 1.0.7
+[32m✔[30m [34mtidyr  [30m 1.1.3     [32m✔[30m [34mstringr[30m 1.4.0
+[32m✔[30m [34mreadr  [30m 1.4.0     [32m✔[30m [34mforcats[30m 0.5.1
+[32m✔[30m [34mpurrr  [30m 0.3.4     [39m
+"
+"2","[30m── [1mConflicts[22m ──────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+[31m✖[30m [34mdplyr[30m::[32mfilter()[30m masks [34mstats[30m::filter()
+[31m✖[30m [34mdplyr[30m::[32mlag()[30m    masks [34mstats[30m::lag()[39m
+"
+"0","library(readr)"
+"0","library(janitor)"
+"2","
+Attaching package: ‘janitor’
+
+"
+"2","The following objects are masked from ‘package:stats’:
+
+    chisq.test, fisher.test
+
+"
+"0","library(gplots)"
+"2","Warning:"
+"2"," package ‘gplots’ was built under R version 4.1.2
+"
+"2","
+Attaching package: ‘gplots’
+
+"
+"2","The following object is masked from ‘package:stats’:
+
+    lowess
+
+"
+"0","library(gridExtra)"
+"2","
+Attaching package: ‘gridExtra’
+
+"
+"2","The following object is masked from ‘package:dplyr’:
+
+    combine
+
+"
+"0","library(gginference)"
+"0","library(caTools)"
+"0","library(car)"
+"2","Warning:"
+"2"," package ‘car’ was built under R version 4.1.2
+"
+"2","Loading required package: carData
+"
+"2","Warning:"
+"2"," package ‘carData’ was built under R version 4.1.2
+"
+"2","
+Attaching package: ‘car’
+
+"
+"2","The following object is masked from ‘package:dplyr’:
+
+    recode
+
+"
+"2","The following object is masked from ‘package:purrr’:
+
+    some
+
+"

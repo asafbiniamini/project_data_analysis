@@ -1,0 +1,251 @@
+---
+title: "Proportion Test"
+output:
+  html_document:
+    theme: flatly
+    highlight: haddock
+---
+---
+<img src="logo.png"
+     width="150" 
+     height="100"
+     alt="Markdown Monster icon"  style="position:absolute;top:30px;left:870px;" />
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+library(ggplot2)
+library(tidyverse)
+library(readr)
+library(janitor)
+library(gplots)
+library(gridExtra)
+library(gginference)
+```
+
+```{r, include = FALSE}
+friends <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-08/friends.csv')
+friends_emotions <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-08/friends_emotions.csv')
+friends_info <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-08/friends_info.csv')
+
+```
+
+### Does Emotional Expression affiliate with Gender?
+
+<p><p>
+<p> To examine this idea, we manipulated our data in four phases:<br>
+<br>
+1) Merged two data sources into one that accounts for every utterance being said and who said it.<br>
+2) Added a column that holds whether being said by a Male or Female. <br>
+3) Aggregated the number of utterances by emotions and sex.<br>
+4) Conducted a proportion test for each of the emotions.<p>
+```{r, include= FALSE}
+emotion_sum_MF <- merge(friends,friends_emotions,by = c("season","episode","scene","utterance")) %>%
+  filter(grepl('Chandler Bing|Joey Tribbiani|Ross Geller|Rachel Green|Monica Geller|Phoebe Buffay', speaker))
+
+emotion_sum_MF = subset(emotion_sum_MF,select = -c(text))  
+
+emotion_sum_MF$sex <- ifelse(emotion_sum_MF$speaker %in% c("Chandler Bing","Joey Tribbiani","Ross Geller"),'M','F') 
+
+emotion_sum_MF1 <- emotion_sum_MF %>%
+  group_by(emotion,sex) %>%
+  summarise(per_episode = n())
+
+
+emotion_sum_MF2 <-  split(emotion_sum_MF1, emotion_sum_MF1$sex)
+
+emotion_final <- merge(emotion_sum_MF2$M,emotion_sum_MF2$F, by= c("emotion"))
+emotion_final <- emotion_final %>% mutate(Male = per_episode.x, 
+                                          Female = per_episode.y)
+emotion_final <- emotion_final %>% select(emotion,Male,Female)
+
+```
+
+<p> In the table below, we can see the completed table.<p>
+```{r}
+emotion_final
+
+```
+<p>The model we chose to answer our second question is the proportion test. We took every emotion and checked if the proportion of the number of expressions by female was equal to 50%.<p>
+
+<!-- adding the emotion_number for ease the sum calculation for prop test -->
+```{r, include=FALSE}
+emotion_number <-  emotion_final %>% select(Male,Female)
+```
+
+
+<p>**Joyful proportion test**<br>
+**H_0: Females feel Joyful as males: P=0.5 **<br>
+**H_1: Females feel Joyful differently than males: P!=0.5 **<p>
+
+
+```{r}
+Joy_test <- prop.test(x = emotion_number$Female[1], n = sum(emotion_number[1,]))
+```
+
+:::: {.columns}
+::: {.column width="50%"}
+```{r, echo=FALSE}
+Joy_test
+```
+*As can be seen, the p-value is much higher than 0.05,
+which means we accept our null hypothesis - females feel joyful as males.*
+
+:::
+
+::: {.column width="50%"}
+```{r, echo = F}
+ggproptest(Joy_test)
+```
+:::
+::::
+<br><br>
+<p>**Mad proportion test**<br>
+**H_0: Females feel Mad as males: P=0.5 **<br>
+**H_1: Females feel Mad differently than males: P!=0.5 **<p>
+```{r}
+Mad_test <- prop.test(x = emotion_number$Female[2], n = sum(emotion_number[2,]))
+```
+:::: {.columns}
+::: {.column width="50%"}
+```{r, echo = F}
+Mad_test
+```
+*As can be seen, the p-value is higher than 0.05,
+which means we accept our null hypothesis - females feel mad as males.*
+:::
+
+::: {.column width="50%"}
+```{r, echo = F}
+ggproptest(Mad_test)
+```
+:::
+::::
+<br><br>
+<p>**Neutral proportion test**<br>
+**H_0: Females feel Neutral as males: P=0.5 **<br>
+**H_1: Females feel Neutral differently than males: P!=0.5 **<p>
+```{r}
+Neutral_test <-prop.test(x = emotion_number$Female[3], n = sum(emotion_number[3,]))
+```
+:::: {.columns}
+::: {.column width="50%"}
+```{r, echo = F}
+Neutral_test
+```
+*As can be seen, the p-value is less than 0.05,
+which means we deny our null hypothesis - Females do not feel neutral as males.<br>
+Because of the area of the 95 percent confidence, we can infer that males<br>
+feel more neutral than females. *
+:::
+
+::: {.column width="50%"}
+```{r, echo = F}
+ggproptest(Neutral_test)
+```
+:::
+::::
+<br><br>
+<p>**Peaceful proportion test**<br>
+**H_0: Females feel Peaceful as males: P=0.5 **<br>
+**H_1: Females feel Peaceful differently than males: P!=0.5 **<p>
+```{r}
+Peacful_test <- prop.test(x = emotion_number$Female[4], n = sum(emotion_number[4,]))
+```
+:::: {.columns}
+::: {.column width="50%"}
+```{r, echo = F}
+Peacful_test
+```
+*As can be seen, the p-value is more than 0.05,
+which means we accept our null hypothesis - females feel Peaceful as males.*
+
+:::
+
+::: {.column width="50%"}
+```{r, echo = F}
+ggproptest(Peacful_test)
+```
+:::
+::::
+<br><br>
+<p>**Powerful proportion test**<br>
+**H_0: Females feel Powerful as males: P=0.5 **<br>
+**H_1: Females feel Powerful differently than males: P!=0.5 **<p>
+<div>
+```{r}
+Powerful_test <- prop.test(x = emotion_number$Female[5], n = sum(emotion_number[5,]))
+```
+:::: {.columns}
+::: {.column width="50%"}
+```{r, echo = F}
+Powerful_test
+```
+*As can be seen, the p-value is more than 0.05,
+which means we accept our null hypothesis - females feel powerful as males.*
+:::
+
+::: {.column width="50%"}
+```{r, echo = F}
+ggproptest(Powerful_test)
+```
+:::
+::::
+</div>
+<br><br>
+<p>**Sad proportion test**<br>
+**H_0: Females feel Sad as males: P=0.5 **<br>
+**H_1: Females feel Sad differently than males: P!=0.5 **<p>
+```{r}
+Sad_test <- prop.test(x = emotion_number$Female[6], n = sum(emotion_number[6,]))
+```
+:::: {.columns}
+::: {.column width="50%"}
+```{r, echo = F}
+Sad_test
+```
+*As can be seen, the p-value is less than 0.05,
+which means we deny our null hypothesis - Females do not feel sad as males.<br>
+Because of the area of the 95 percent confidence, we can infer that<br>
+females feel sadder than males. *
+:::
+
+::: {.column width="50%"}
+```{r, echo = F}
+ggproptest(Sad_test)
+```
+:::
+::::
+
+<br><br>
+<p>**Scared proportion test**<br>
+**H_0: Females feel Scared as males: P=0.5 **<br>
+**H_1: Females feel Scared differently than males: P!=0.5 **<p>
+
+```{r}
+Scared_prop <-prop.test(x = emotion_number$Female[7], n = sum(emotion_number[7,]))
+```
+
+:::: {.columns}
+::: {.column width="50%"}
+```{r, echo = F}
+Scared_prop
+```
+*As can be seen, the p-value is less than 0.05,
+which means we deny our null hypothesis - Females do not feel Scared as males.<br>
+Because of the area of 95 percent confidence, we can infer that males<br>
+feel more scared than females.*
+
+:::
+
+::: {.column width="50%"}
+```{r, echo = F}
+ggproptest(Scared_prop)
+```
+:::
+::::
+
+
+
+
+
+

@@ -1,0 +1,5 @@
+"0","filterd = friends_info %>% filter(dt$us_views_millions<50)"
+"0","dt_grouped_filterd <- ggplot(data = filterd, aes(x = us_views_millions, y = imdb_rating)) +"
+"0","  geom_point() "
+"0","dt_grouped_filterd"
+"0",""

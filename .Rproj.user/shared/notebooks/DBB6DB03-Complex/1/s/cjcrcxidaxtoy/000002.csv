@@ -1,0 +1,1 @@
+"0","plot(imdb_rating~us_views_millions, data = filterd)"

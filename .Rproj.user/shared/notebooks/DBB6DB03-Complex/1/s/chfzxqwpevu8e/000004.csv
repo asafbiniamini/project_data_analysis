@@ -1,0 +1,7 @@
+"0","liner_reg <-ggplot(filterd, aes(x = us_views_millions, y = imdb_rating)) + "
+"0","  geom_point() +"
+"0","  stat_smooth(method = ""lm"", col = ""red"", se = FALSE)"
+"0","  "
+"0","liner_reg"
+"2","`geom_smooth()` using formula 'y ~ x'
+"

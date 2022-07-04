@@ -1,0 +1,1 @@
+"0","Mad_test <- prop.test(x = 573, n = 1101, p = 0.5, alternative = ""two.sided"", conf.level = 0.95)"
